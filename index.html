@@ -117,6 +117,7 @@ textarea{width:100%;min-height:120px;padding:14px;border:3px solid var(--line);b
     <div class="field"><label>Nivel</label><div class="seg" id="fNivel"><button data-v="1" class="sel">🌱 Fácil</button><button data-v="2">🌿 Medio</button><button data-v="3">🌳 Avanzado</button></div></div>
     <div class="field"><label>Duración</label><div class="seg" id="fDur"><button data-v="30">30 min</button><button data-v="40" class="sel">40 min</button><button data-v="50">50 min</button></div></div>
     <div class="field"><label>Voz que lee las instrucciones</label><div class="seg" id="fVoz"><button data-v="1" class="sel">🔊 Sí</button><button data-v="0">🔇 No</button></div></div>
+    <div class="field"><label>Velocidad de la voz</label><div class="seg" id="fVel"><button data-v="1">🐢 Pausada</button><button data-v="1.2" class="sel">Normal</button><button data-v="1.45">🐇 Rápida</button></div></div>
     <div class="row"><button class="btn" id="bStart">▶ Comenzar sesión</button><button class="btn sec" id="bHist">📋 Historial</button></div>
     <div class="plan muted" id="plan"></div>
   </div>
@@ -151,7 +152,7 @@ const mmss=s=>{s=Math.max(0,s);return Math.floor(s/60)+':'+String(s%60).padStart
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.toggle('on',s.id===id));window.scrollTo(0,0)}
 
-const S={name:'',level:1,total:40,voice:true,results:[],mood:null,date:null,idx:0,recId:null};
+const S={name:'',level:1,total:40,voice:true,rate:1.2,results:[],mood:null,date:null,idx:0,recId:null};
 let blk=null;
 
 /* ---------- voz y sonido ---------- */
@@ -164,7 +165,7 @@ function say(t){
     const txt=String(t).replace(/<[^>]+>/g,'').replace(/\p{Extended_Pictographic}|️|‍/gu,'').replace(/[«»]/g,'');
     const u=new SpeechSynthesisUtterance(txt);
     const v=voices.find(v=>/es[-_](MX|US|419|CO|AR|CL|PE)/i.test(v.lang))||voices[0];
-    u.lang=v?v.lang:'es-ES';if(v)u.voice=v;u.rate=.95;speechSynthesis.speak(u)}catch(e){}
+    u.lang=v?v.lang:'es-ES';if(v)u.voice=v;u.rate=S.rate;speechSynthesis.speak(u)}catch(e){}
 }
 function hush(){try{speechSynthesis.cancel()}catch(e){}}
 let ac=null;
@@ -599,6 +600,9 @@ function renderPlan(){
 segInit('#fNivel',v=>S.level=+v);
 segInit('#fDur',v=>{S.total=+v;renderPlan()});
 segInit('#fVoz',v=>{S.voice=v==='1';if(S.voice)say('Voz activada')});
+/* velocidad de la voz: se recuerda en la tablet */
+segInit('#fVel',v=>{S.rate=+v;try{localStorage.setItem('menteActiva.vel',v)}catch(e){}say('Así sonará la voz')});
+try{const v=localStorage.getItem('menteActiva.vel');if(v){S.rate=+v;$('#fVel').querySelectorAll('button').forEach(b=>b.classList.toggle('sel',b.dataset.v===v))}}catch(e){}
 renderPlan();
 $('#bHist').onclick=()=>{renderHist();show('sHist')};
 $('#bStart').onclick=()=>{

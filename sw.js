@@ -1,6 +1,6 @@
 // Mente Activa: funciona sin internet una vez abierta la primera vez.
 // Muestra lo guardado al instante y se actualiza sola en segundo plano cuando hay conexión.
-const CACHE = 'mente-activa-v2';
+const CACHE = 'mente-activa-v3';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
